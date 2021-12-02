@@ -1,32 +1,19 @@
 defmodule Day02 do
-  @moduledoc """
-  Documentation for `Day02`.
-  """
-
   def part_1(input) do
-    {pos, dep} =
-      input
-      |> parse()
-      |> Enum.reduce({0, 0}, fn
-        {:forward, value}, {pos, dep} -> {pos + value, dep}
-        {:down, value}, {pos, dep} -> {pos, dep + value}
-        {:up, value}, {pos, dep} -> {pos, dep - value}
-      end)
-
-    pos * dep
+    run(input, State)
   end
 
   def part_2(input) do
-    {pos, dep, _} =
+    run(input, AimedState)
+  end
+
+  defp run(input, mod) do
+    %{position: position, depth: depth} =
       input
       |> parse()
-      |> Enum.reduce({0, 0, 0}, fn
-        {:forward, value}, {pos, dep, aim} -> {pos + value, dep + value * aim, aim}
-        {:down, value}, {pos, dep, aim} -> {pos, dep, aim + value}
-        {:up, value}, {pos, dep, aim} -> {pos, dep, aim - value}
-      end)
+      |> Enum.reduce(mod.new(), &mod.advance(&2, [&1]))
 
-    pos * dep
+    position * depth
   end
 
   # Parse input into Keyword list with keys being commands, values being command arguments
